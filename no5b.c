@@ -29,6 +29,11 @@ void main()
         int shmid = shmget(key, sizeof(int), IPC_CREAT | 0666);
         stock = shmat(shmid, NULL, 0);
 
+        // printf("Program 1 : %d\n", *value);
+	    // *value = 30;
+
+        // sleep(5);
+
         *stock = 1000;
         
         while(1){
