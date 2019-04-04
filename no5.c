@@ -14,6 +14,7 @@ int health_status = 300;
 int enemy_health = 100;
 int food_stock = 100;
 int temp;
+int siap = 0;
 char choose;
 
 int mygetch(void)
@@ -52,8 +53,8 @@ void belanja(){
                 food_stock += 10;
                 *stock -= 10;
             }else{
-                food_stock +=0;
-                *stock -= 0;
+                system("clear");
+                printf("stock tidak cukup");
             }
         }
         if(choose=='2'){
@@ -93,8 +94,13 @@ void pick(){
             printf("Health      : %d\n",health_status);
             printf("Hunger      : %d\n",hunger_status);
             printf("Hygiene     : %d\n",hygiene_status);
-            printf("Food left   : %d\n",food_stock);
-            //printf("Bath will be ready in %d",);
+            printf("Food left   : %d\n", food_stock);
+            if(siap > 0){
+                printf("Bath will be ready in %d\n",siap);
+            }else{
+                printf("Bath is ready\n");
+            }
+            
 
             printf("Choices \n");
             printf("1. Eat \n");
@@ -112,9 +118,21 @@ void pick(){
                 sleep(1);
             }
             if(choose=='2'){
-                hygiene_status += 30;
+                if(hygiene_status<100){
+                    if(siap==0){
+                        hygiene_status += 30;
+                        if(hygiene_status > 100){
+                            hygiene_status = 100;
+                        }
+                        siap=20;
+                    }   
+                }else{
+                    system("clear");
+                    printf("tidak bisa\n");
+                    sleep(2);
+                    system("clear");
+                }
                 //printf("%d",hygiene_status);
-                sleep(20);
             }
             if(choose=='3'){
                 system("clear");
@@ -138,6 +156,15 @@ void pick(){
             system("clear");
         }
 } 
+
+void* ready(void *arg){
+    while(1){
+        if(siap > 0){
+            siap--;
+            sleep(1);
+        }
+    }
+}
 
 void* makan(void *arg)
 {
@@ -181,10 +208,11 @@ int main(void)
 
     printf("Your Mosnter Name is : ");
     printf("%s\n",name);
+    sleep(2);
 
     pthread_create(&(tid1), NULL, makan, NULL);
     pthread_create(&(tid2), NULL, mandi, NULL);
     pthread_create(&(tid3), NULL, regen, NULL);
-    //pthread_create(&(tid4), NULL, stok, NULL);
+    pthread_create(&(tid4), NULL, ready, NULL);
     pick();
 }
