@@ -78,6 +78,8 @@ void fight(){
         if(choose=='1'){
             health_status -= 20;
             enemy_health -= 20;
+            // printf("%d",health_status);
+            // printf("%d",enemy_health);
         }
         if(choose=='2'){
             break;
@@ -126,12 +128,12 @@ void pick(){
                 break;
             }
             if(hunger_status==0){
-                    printf("Monstermu Mati Kelaparan\n");
-                    break;
+                printf("Monstermu Mati Kelaparan\n");
+                break;
             }
             if(hygiene_status==0){
-                    printf("Monstermu Mati\n");
-                    break;
+                printf("Monstermu Mati\n");
+                break;
             }
             system("clear");
         }
