@@ -92,7 +92,7 @@ Gunakan struct yang berisi satu value int yaitu high untuk menyimpan setiap angk
         return 0;
 	}
 
-Code lengkapnya : [Soal 1](/soalno1.c) 
+Code lengkapnya : [Soal 1](/No1/soalno1.c) 
 
 ### No 2
 Pada suatu hari ada orang yang ingin berjualan 1 jenis barang secara private, dia memintamu membuat program C dengan spesifikasi sebagai berikut:
@@ -389,13 +389,13 @@ Pada clientpenjual kirim pesan tambah pada serverpenjual agar stok ditambah.
     return 0;
 	}
 
-Code lengkapnya : [Client Pembeli](/clientpembeli.c) 
+Code lengkapnya : [Client Pembeli](/No2/clientpembeli.c) 
 
-Code lengkapnya : [Client Penjual](/clientpenjual.c) 
+Code lengkapnya : [Client Penjual](/No2/clientpenjual.c) 
 
-Code lengkapnya : [Server Pembeli](/serverpembeli.c) 
+Code lengkapnya : [Server Pembeli](/No2/serverpembeli.c) 
 
-Code lengkapnya : [Server Penjual](/serverpenjual.c)
+Code lengkapnya : [Server Penjual](/No2/serverpenjual.c)
 
 ### No 3
 Agmal dan Iraj merupakan 2 sahabat yang sedang kuliah dan hidup satu kostan, sayangnya mereka mempunyai gaya hidup yang berkebalikan, dimana Iraj merupakan laki-laki yang sangat sehat,rajin berolahraga dan bangun tidak pernah kesiangan sedangkan Agmal hampir menghabiskan setengah umur hidupnya hanya untuk tidur dan ‘ngoding’. Dikarenakan mereka sahabat yang baik, Agmal dan iraj sama-sama ingin membuat satu sama lain mengikuti gaya hidup mereka dengan cara membuat Iraj sering tidur seperti Agmal, atau membuat Agmal selalu bangun pagi seperti Iraj. Buatlah suatu program C untuk menggambarkan kehidupan mereka dengan spesifikasi sebagai berikut:
@@ -509,7 +509,7 @@ Terakhir membuat kondisi dimana jika wakeup_status > 100 dan spirit_status < 0 m
             printf("Iraj ikut tidur, dan bangun kesiangan bersama Agmal\n");
         }
         
-Code Lengkapnya : [soal3](/no3.c)
+Code Lengkapnya : [soal3](/No3/no3.c)
 
 ### No 4
 Buatlah sebuah program C dimana dapat menyimpan list proses yang sedang berjalan (ps -aux) maksimal 10 list proses. Dimana awalnya list proses disimpan dalam di 2 file ekstensi .txt yaitu  SimpanProses1.txt di direktori /home/Document/FolderProses1 dan SimpanProses2.txt di direktori /home/Document/FolderProses2 , setelah itu masing2 file di  kompres zip dengan format nama file KompresProses1.zip dan KompresProses2.zip dan file SimpanProses1.txt dan SimpanProses2.txt akan otomatis terhapus, setelah itu program akan menunggu selama 15 detik lalu program akan mengekstrak kembali file KompresProses1.zip dan KompresProses2.zip 
@@ -589,7 +589,7 @@ Gunakan 2 thread untuk menyimpan 10 ps -aux pada file pertama dan kedua, kemudia
 	    return 0;
 	}
 
-Code lengkapnya: [Soal 4](/soalno4.c)
+Code lengkapnya: [Soal 4](/No4/soalno4.c)
 
 ### No 5
 Angga, adik Jiwang akan berulang tahun yang ke sembilan pada tanggal 6 April besok. Karena lupa menabung, Jiwang tidak mempunyai uang sepeserpun untuk membelikan Angga kado. Kamu sebagai sahabat Jiwang ingin membantu Jiwang membahagiakan adiknya sehingga kamu menawarkan bantuan membuatkan permainan komputer sederhana menggunakan program C. Jiwang sangat menyukai idemu tersebut. Berikut permainan yang Jiwang minta. 
@@ -940,6 +940,6 @@ Sedangkangkan untuk membeli stock dibutuhkan restock dengn membuat program baru 
 		shmdt(stock);
 		shmctl(shmid, IPC_RMID, NULL);
 		
-Code lengkapnya : [Soal5](/no5.c)
+Code lengkapnya : [Soal5](/No5/no5.c)
 
-Code lengkapnya : [Soal5b](/no5b.c)
+Code lengkapnya : [Soal5b](/No5/no5b.c)
