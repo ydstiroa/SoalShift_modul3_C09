@@ -16,6 +16,7 @@ int food_stock = 100;
 int temp;
 int siap = 0;
 char choose;
+char name[1000];
 
 int mygetch(void)
 {
@@ -61,14 +62,21 @@ void belanja(){
             break;
         }system("clear");
     }
+
+    // printf("Program 1 : %d\n", *value);
+	// *value = 30;
+
+    // sleep(5);
+    
     shmdt(stock);
     shmctl(shmid, IPC_RMID, NULL);
 }
 
 void fight(){
+    enemy_health=100;
     while(1){
         printf("Battle Mode\n");
-        printf("Monster's Health : %d\n",health_status);
+        printf("%s's Health : %d\n",name,health_status);
         printf("Enemy Health : %d\n",enemy_health);
         printf("Choices\n");
         printf("1. Attack\n");
@@ -79,6 +87,13 @@ void fight(){
         if(choose=='1'){
             health_status -= 20;
             enemy_health -= 20;
+
+            if(enemy_health == 0){
+                printf("Congratulation\n");
+                printf("Your Enemy is Dead\n");
+                sleep(2);
+                break;
+            }
             // printf("%d",health_status);
             // printf("%d",enemy_health);
         }
@@ -112,10 +127,21 @@ void pick(){
             choose= mygetch();
 
             if(choose=='1'){
-                hunger_status += 15; 
-                food_stock -=15; 
-                //printf("%d\n",hunger_status);
-                sleep(1);
+                if(food_stock > 0){  
+                    //printf("%d\n",hunger_status);
+                    if(food_stock-15 >=0){
+                        hunger_status += 15;
+                        food_stock -=15;
+                        sleep(1);
+                    }else{
+                        hunger_status += food_stock;
+                        food_stock = 0;
+                    }
+                }else{
+                    printf("\nMakanan Tidak Tersedia!\n");
+                    printf("Segera Restock Makanan\n");
+                    sleep(2);
+                }
             }
             if(choose=='2'){
                 if(hygiene_status<100){
@@ -146,11 +172,11 @@ void pick(){
                 break;
             }
             if(hunger_status==0){
-                printf("Monstermu Mati Kelaparan\n");
+                printf("%s Mati Kelaparan\n",name);
                 break;
             }
             if(hygiene_status==0){
-                printf("Monstermu Mati\n");
+                printf("%s Mati Tidak Terawat\n",name);
                 break;
             }
             system("clear");
@@ -201,7 +227,6 @@ void* regen(void *arg){
 int main(void)
 {
     char msg;
-    char name[1000];
 
     printf("Enter Name : ");
     scanf("%s",name);
