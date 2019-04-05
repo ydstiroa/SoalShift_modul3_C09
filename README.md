@@ -423,7 +423,85 @@ b.Kedua karakter memiliki status yang unik
 
    ~Spirit_Status Iraj <= 0 (Tampilkan Pesan “Iraj ikut tidur, dan bangun kesiangan bersama Agmal”)
 
+Jawab :
 
+
+Pertama-tama kita harus membuat thread terlebih dahulu untuk agmal dan juga iraj dimana fungsi thread tesebut nantinya akan digunakan untuk mendisable input tertentu jika sudah melebihi 3 kali
+
+    pthread_create(&(tid1), NULL, Agmal, NULL);
+    pthread_create(&(tid2), NULL, Iraj, NULL);
+
+     void* Agmal(void *arg)
+    {
+        while(1){
+            if(flg_agmal==1){
+                sleep(10);
+                flg_agmal=0;
+                j=0;
+            }
+        }
+    }
+
+    void* Iraj(void *arg)
+    {
+        while(1){
+            if(flg_iraj==1){
+                sleep(10);
+                flg_iraj=0;
+                i=0;
+            }
+        }
+    }
+    
+Setelah itu memasukkan input dan mengcompare stringnya yang yang disimpan dalam sebuah variable baru dan nantinya berguna untuk kondisi lainnya
+
+    printf("Agmal WakeUp_Status = %d\n",WakeUp_Status);
+            printf("Iraj Spirit_Status = %d\n",Spirit_Status);
+            scanf("%[^\n]s",msg);
+            scanf("%c",&a);
+            tmp_agmal = strcmp(msg,"Agmal Ayo Bangun");
+            tmp_iraj = strcmp(msg,"Iraj Ayo Tidur");
+
+Lalu cek apakah string yang di input dan sudah dimasukkan ke variable baru setelah di compare tersebut true, jika iya maka membuat spirit_status dari iraj berkurang atau membuat wakeup_status dari agmal bertambah dan tentu juga meng-increment suatu variable i dan j untuk dipakai di kondisi lainnya yaitu mendisable input tertentu selama 10s
+
+    if(tmp_agmal == 0){
+                if(flg_agmal==0){
+                    WakeUp_Status += 15;
+                    i++;
+                }else{
+                    printf("Agmal Ayo Bangun disabled 10 s \n");
+                }
+            }
+            if(tmp_iraj == 0){
+                if(flg_iraj==0){
+                    Spirit_Status -= 20;
+                    j++;
+                }else{
+                    printf("Fitur Iraj Ayo Tidur disabled 10 s \n");
+                }
+            }
+
+Buat kondisi untuk mendisable selama 10s menggunakan variable i dan j yang sudah di deklarasi dan di increment sebelumnya
+
+     if(j==3){
+              flg_agmal=1;
+              //j=0;
+          }
+          if(i==3){
+              flg_iraj=1;
+              //i=0;
+          }
+          
+Terakhir membuat kondisi dimana jika wakeup_status > 100 dan spirit_status < 0 maka akan di print
+
+    if(WakeUp_Status >= 100){
+            printf("Agmal Terbangun,mereka bangun pagi dan berolahraga\n");
+        }
+        if(Spirit_Status <= 0){
+            printf("Iraj ikut tidur, dan bangun kesiangan bersama Agmal\n");
+        }
+        
+Code Lengkapnya : [soal3](/no3.c)
 
 ### No 4
 Buatlah sebuah program C dimana dapat menyimpan list proses yang sedang berjalan (ps -aux) maksimal 10 list proses. Dimana awalnya list proses disimpan dalam di 2 file ekstensi .txt yaitu  SimpanProses1.txt di direktori /home/Document/FolderProses1 dan SimpanProses2.txt di direktori /home/Document/FolderProses2 , setelah itu masing2 file di  kompres zip dengan format nama file KompresProses1.zip dan KompresProses2.zip dan file SimpanProses1.txt dan SimpanProses2.txt akan otomatis terhapus, setelah itu program akan menunggu selama 15 detik lalu program akan mengekstrak kembali file KompresProses1.zip dan KompresProses2.zip 
