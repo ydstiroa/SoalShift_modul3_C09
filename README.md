@@ -18,6 +18,80 @@ Contoh:
 
 Jawab :
 
+Gunakan struct yang berisi satu value int yaitu high untuk menyimpan setiap angka dari inputan untuk di proses factorialnya. Terima input angka dipisah dengan spasi dan berakhir jika inputan adalah enter, setiap inputan disimpan dalam array kemudian diurutkan. Proses masing masing factorial dari setiap angka inputan secara paralel dengan thread kemudian di print.
+
+    #include<stdio.h>
+    #include<pthread.h>
+    #include<stdlib.h>
+    #include<unistd.h>
+    #include<math.h>
+
+    int prime_arr[1000],n=0;
+    pthread_t tid[50];
+
+    struct range{
+	    int high;
+    };
+
+    void* tulis(void* args){
+        struct range*extract =(struct range*)args;
+        unsigned long long hasil=1;
+        //printf("%d \n",extract->high);
+
+        for(int j=1;j<=extract->high;j++){
+             //printf("%d",j);
+             hasil=hasil*j;
+        }
+        printf("%d! = %llu\n",extract->high,hasil);
+     }
+
+    void urut(){
+        int x;
+        for (int i=0;i<n-1;++i) {
+            for (int j=i+1; j<n;++j){
+        	      if (prime_arr[i] > prime_arr[j]) {
+                    x =  prime_arr[i];
+            	      prime_arr[i] = prime_arr[j];
+        		        prime_arr[j] = x;
+           	    }    
+            }     
+        }
+    }
+
+    int main(){
+        int a=0,temp;
+        //scanf("%d",&t);
+        char input;
+        struct range rentang;
+        rentang.high=n;
+
+        // for(int i=1;i<=t; i++){
+        //     scanf("%d",&n);
+        //     pthread_create(&tid[i], NULL, &tulis,(void *)&rentang);
+        //     rentang.high=n;
+        // }   
+    	
+  	    do {
+      	    scanf("%d%c", &prime_arr[a], &input);
+    	      a++;
+	          n++;
+  	    } while(input != '\n');
+
+        urut();
+
+   	    a=0;
+
+        while(a<n) {
+            rentang.high = prime_arr[a];
+            temp=prime_arr[a];
+            pthread_create(&tid[temp], NULL, &tulis,(void *)&rentang);
+            pthread_join(tid[temp],NULL);
+            a++;
+        }
+
+        return 0;
+}
+
 
 ### No 2
 Pada suatu hari ada orang yang ingin berjualan 1 jenis barang secara private, dia memintamu membuat program C dengan spesifikasi sebagai berikut:
@@ -47,6 +121,272 @@ Pada suatu hari ada orang yang ingin berjualan 1 jenis barang secara private, di
   h.Menggunakan thread, socket, shared memory
   
 Jawab :
+
+Buat 4 program, serverpembeli, serverpenjual, clientpembeli, dan client penjual. Socket pada port 8080 pada pembeli dan 8081 pada penjual. Program terus menerima input sampai program diberhentikan, gunakan shared memory untuk membagi variabel stok agar server pembeli dengan server penjual menyimpan stok dengan jumlah yang sama, kemudian pada server penjual lakukan thread untuk menampilkan jumlah stok setiap 5 detik.
+
+Pada serverpembeli hanya menerima pesan dari clientpembeli, jika valid yaitu beli maka stok dikurangi.
+
+    #include <stdio.h>
+    #include <sys/socket.h>
+    #include <stdlib.h>
+    #include <netinet/in.h>
+    #include <string.h>
+    #include <unistd.h>
+    #include <sys/ipc.h>
+    #include <sys/shm.h>
+    #define PORT 8080
+
+
+    int main(int argc, char const *argv[]) {
+        int server_fd, new_socket, valread;
+        struct sockaddr_in address;
+        int opt = 1;
+        int addrlen = sizeof(address);
+        char buffer[1024] = {0};
+        char *berhasil = "transaksi berhasil";
+        char *gagal = "transaksi gagal   ";
+        char *invalid = "invalid input     ";
+      
+    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
+        perror("socket failed");
+        exit(EXIT_FAILURE);
+    }
+      
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) {
+        perror("setsockopt");
+        exit(EXIT_FAILURE);
+    }
+
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_port = htons( PORT );
+      
+    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address))<0) {
+        perror("bind failed");
+        exit(EXIT_FAILURE);
+    }
+
+    if (listen(server_fd, 3) < 0) {
+        perror("listen");
+        exit(EXIT_FAILURE);
+    }
+
+    if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0) {
+        perror("accept");
+        exit(EXIT_FAILURE);
+    }
+
+    key_t key = 1234;
+    int *stok;
+
+    int shmid = shmget(key, sizeof(int), IPC_CREAT | 0666); 
+    stok = shmat(shmid, NULL, 0);
+
+    while(1){
+        valread = read( new_socket , buffer, 1024);
+        if(strcmp(buffer,"beli")==0){
+            if(*stok>0){*stok-=1;
+                send(new_socket , berhasil , strlen(berhasil) , 0 );
+            }
+            else{
+                send(new_socket , gagal , strlen(gagal) , 0 );
+            }
+        }
+        else{
+            send(new_socket , invalid , strlen(invalid) , 0 );
+        }
+        //memset(buffer,0,1024);
+        //shmdt(stok);
+        //shmctl(shmid, IPC_RMID, NULL);
+        //printf("%s\n",buffer );
+        //send(new_socket , hello , strlen(hello) , 0 );
+    }
+    return 0;
+}
+
+Pada serverpenjual hanya menerima pesan dari client penjual jika tambah maka stok akan ditambahkan 1.Kemudian print jumlah stok setiap 5 detik.
+
+    #include <stdio.h>
+    #include <sys/socket.h>
+    #include <stdlib.h>
+    #include <netinet/in.h>
+    #include <string.h>
+    #include <unistd.h>
+    #include <sys/ipc.h>
+    #include <sys/shm.h>
+    #include<pthread.h>
+    #define PORT 8081
+    int *stok;
+    pthread_t tid1;
+    void* tulis(void *arg)
+    {
+        int i = 0;
+        while(1){
+            printf("stok saat ini : %d\n", *stok);
+            sleep(5);
+        }
+    }
+
+    int main(int argc, char const *argv[]) {
+        int server_fd, new_socket, valread;
+        struct sockaddr_in address;
+        int opt = 1;
+        int addrlen = sizeof(address);
+        char buffer[1024] = {0};
+        char *invalid = "invalid input     ";
+        char *sukses = "input ditambah    ";
+
+    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
+        perror("socket failed");
+        exit(EXIT_FAILURE);
+    }
+      
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) {
+        perror("setsockopt");
+        exit(EXIT_FAILURE);
+    }
+
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_port = htons( PORT );
+      
+    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address))<0) {
+        perror("bind failed");
+        exit(EXIT_FAILURE);
+    }
+
+    if (listen(server_fd, 3) < 0) {
+        perror("listen");
+        exit(EXIT_FAILURE);
+    }
+
+    if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0) {
+        perror("accept");
+        exit(EXIT_FAILURE);
+    }
+
+    key_t key = 1234;
+    
+
+    int shmid = shmget(key, sizeof(int), IPC_CREAT | 0666); 
+    stok = shmat(shmid, NULL, 0);
+    pthread_create(&(tid1), NULL, tulis, NULL);
+    while(1){
+        valread = read( new_socket , buffer, 1024);
+        if(strcmp(buffer,"tambah")==0){
+            *stok+=1;
+            send(new_socket , sukses , strlen(sukses) , 0 );
+        }
+        else{
+            send(new_socket , invalid , strlen(invalid) , 0 );
+        }
+        memset(buffer,0,1024);
+        //jumlah = *stok;
+        
+        //shmdt(stok);
+        //shmctl(shmid, IPC_RMID, NULL);
+        //printf("%s\n",buffer );
+        //send(new_socket , hello , strlen(hello) , 0 );
+    }
+    return 0;
+}
+
+Pada clientpembeli kirim pesan beli pada serverpembeli.
+
+    #include <stdio.h>
+    #include <sys/socket.h>
+    #include <stdlib.h>
+    #include <netinet/in.h>
+    #include <string.h>
+    #include <unistd.h>
+    #include <arpa/inet.h>
+    #define PORT 8080
+
+    int main(int argc, char const *argv[]) {
+        struct sockaddr_in address;
+        int sock = 0, valread;
+        struct sockaddr_in serv_addr;
+        char beli[9];
+        char buffer[1024] = {0};
+        if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+            printf("\n Socket creation error \n");
+            return -1;
+    }
+  
+    memset(&serv_addr, '0', sizeof(serv_addr));
+  
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(PORT);
+      
+    if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)<=0) {
+        printf("\nInvalid address/ Address not supported \n");
+        return -1;
+    }
+  
+    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
+        printf("\nConnection Failed \n");
+        return -1;
+    }
+    
+    while(1){
+        scanf("%s", beli);
+        //printf("%s\n", beli);
+        send(sock , beli , strlen(beli) , 0 );
+        //memset(beli,0,sizeof(beli));
+        valread = read( sock , buffer, 1024);
+        printf("%s\n",buffer );
+        memset(buffer,0,1024);
+    }    
+    return 0;
+}
+
+Pada clientpenjual kirim pesan tambah pada serverpenjual agar stok ditambah.
+
+    #include <stdio.h>
+    #include <sys/socket.h>
+    #include <stdlib.h>
+    #include <netinet/in.h>
+    #include <string.h>
+    #include <unistd.h>
+    #include <arpa/inet.h>
+    #define PORT 8081
+
+    int main(int argc, char const *argv[]) {
+        struct sockaddr_in address;
+        int sock = 0, valread;
+        struct sockaddr_in serv_addr;
+        char tambah[9];
+        char buffer[1024] = {0};
+        if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+            printf("\n Socket creation error \n");
+            return -1;
+        }
+  
+    memset(&serv_addr, '0', sizeof(serv_addr));
+  
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(PORT);
+      
+    if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)<=0) {
+        printf("\nInvalid address/ Address not supported \n");
+        return -1;
+    }
+  
+    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
+        printf("\nConnection Failed \n");
+        return -1;
+    }
+    
+    while(1){
+        scanf("%s", tambah);
+        send(sock , tambah , strlen(tambah) , 0 );
+        //memset(tambah,0,sizeof(tambah));
+        valread = read( sock , buffer, 1024);
+        printf("%s\n",buffer );
+        memset(buffer,0,1024);
+    }    
+    return 0;
+}
 
 
 ### No 3
@@ -86,6 +426,16 @@ b.Kedua karakter memiliki status yang unik
 
 
 ### No 4
+Buatlah sebuah program C dimana dapat menyimpan list proses yang sedang berjalan (ps -aux) maksimal 10 list proses. Dimana awalnya list proses disimpan dalam di 2 file ekstensi .txt yaitu  SimpanProses1.txt di direktori /home/Document/FolderProses1 dan SimpanProses2.txt di direktori /home/Document/FolderProses2 , setelah itu masing2 file di  kompres zip dengan format nama file KompresProses1.zip dan KompresProses2.zip dan file SimpanProses1.txt dan SimpanProses2.txt akan otomatis terhapus, setelah itu program akan menunggu selama 15 detik lalu program akan mengekstrak kembali file KompresProses1.zip dan KompresProses2.zip 
+Dengan Syarat : 
+Setiap list proses yang di simpan dalam masing-masing file .txt harus berjalan bersama-sama
+Ketika mengkompres masing-masing file .txt harus berjalan bersama-sama
+Ketika Mengekstrak file .zip juga harus secara bersama-sama
+Ketika Telah Selesai melakukan kompress file .zip masing-masing file, maka program akan memberi pesan “Menunggu 15 detik untuk mengekstrak kembali”
+Wajib Menggunakan Multithreading
+Boleh menggunakan system
 
+Jawab :
+Gunakan 2 thread untuk menyimpan 10 ps -aux pada file pertama dan kedua, kemudian 2 thread untuk menzip file pertama pada zip pertama
 
 ### No 5
