@@ -90,7 +90,7 @@ Gunakan struct yang berisi satu value int yaitu high untuk menyimpan setiap angk
         }
 
         return 0;
-}
+	}
 
 
 ### No 2
@@ -126,83 +126,83 @@ Buat 4 program, serverpembeli, serverpenjual, clientpembeli, dan client penjual.
 
 Pada serverpembeli hanya menerima pesan dari clientpembeli, jika valid yaitu beli maka stok dikurangi.
 
-    #include <stdio.h>
-    #include <sys/socket.h>
-    #include <stdlib.h>
-    #include <netinet/in.h>
-    #include <string.h>
-    #include <unistd.h>
-    #include <sys/ipc.h>
-    #include <sys/shm.h>
-    #define PORT 8080
+	    #include <stdio.h>
+	    #include <sys/socket.h>
+	    #include <stdlib.h>
+	    #include <netinet/in.h>
+	    #include <string.h>
+	    #include <unistd.h>
+	    #include <sys/ipc.h>
+	    #include <sys/shm.h>
+	    #define PORT 8080
 
 
-    int main(int argc, char const *argv[]) {
-        int server_fd, new_socket, valread;
-        struct sockaddr_in address;
-        int opt = 1;
-        int addrlen = sizeof(address);
-        char buffer[1024] = {0};
-        char *berhasil = "transaksi berhasil";
-        char *gagal = "transaksi gagal   ";
-        char *invalid = "invalid input     ";
-      
-    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
-        perror("socket failed");
-        exit(EXIT_FAILURE);
-    }
-      
-    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) {
-        perror("setsockopt");
-        exit(EXIT_FAILURE);
-    }
+	int main(int argc, char const *argv[]) {
+		int server_fd, new_socket, valread;
+		struct sockaddr_in address;
+		int opt = 1;
+		int addrlen = sizeof(address);
+		char buffer[1024] = {0};
+		char *berhasil = "transaksi berhasil";
+		char *gagal = "transaksi gagal   ";
+		char *invalid = "invalid input     ";
 
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons( PORT );
-      
-    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address))<0) {
-        perror("bind failed");
-        exit(EXIT_FAILURE);
-    }
+	    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
+		perror("socket failed");
+		exit(EXIT_FAILURE);
+	    }
 
-    if (listen(server_fd, 3) < 0) {
-        perror("listen");
-        exit(EXIT_FAILURE);
-    }
+	    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) {
+		perror("setsockopt");
+		exit(EXIT_FAILURE);
+	    }
 
-    if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0) {
-        perror("accept");
-        exit(EXIT_FAILURE);
-    }
+	    address.sin_family = AF_INET;
+	    address.sin_addr.s_addr = INADDR_ANY;
+	    address.sin_port = htons( PORT );
 
-    key_t key = 1234;
-    int *stok;
+	    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address))<0) {
+		perror("bind failed");
+		exit(EXIT_FAILURE);
+	    }
 
-    int shmid = shmget(key, sizeof(int), IPC_CREAT | 0666); 
-    stok = shmat(shmid, NULL, 0);
+	    if (listen(server_fd, 3) < 0) {
+		perror("listen");
+		exit(EXIT_FAILURE);
+	    }
 
-    while(1){
-        valread = read( new_socket , buffer, 1024);
-        if(strcmp(buffer,"beli")==0){
-            if(*stok>0){*stok-=1;
-                send(new_socket , berhasil , strlen(berhasil) , 0 );
-            }
-            else{
-                send(new_socket , gagal , strlen(gagal) , 0 );
-            }
-        }
-        else{
-            send(new_socket , invalid , strlen(invalid) , 0 );
-        }
-        //memset(buffer,0,1024);
-        //shmdt(stok);
-        //shmctl(shmid, IPC_RMID, NULL);
-        //printf("%s\n",buffer );
-        //send(new_socket , hello , strlen(hello) , 0 );
-    }
-    return 0;
-}
+	    if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0) {
+		perror("accept");
+		exit(EXIT_FAILURE);
+	    }
+
+	    key_t key = 1234;
+	    int *stok;
+
+	    int shmid = shmget(key, sizeof(int), IPC_CREAT | 0666); 
+	    stok = shmat(shmid, NULL, 0);
+
+	    while(1){
+		valread = read( new_socket , buffer, 1024);
+		if(strcmp(buffer,"beli")==0){
+		    if(*stok>0){*stok-=1;
+			send(new_socket , berhasil , strlen(berhasil) , 0 );
+		    }
+		    else{
+			send(new_socket , gagal , strlen(gagal) , 0 );
+		    }
+		}
+		else{
+		    send(new_socket , invalid , strlen(invalid) , 0 );
+		}
+		//memset(buffer,0,1024);
+		//shmdt(stok);
+		//shmctl(shmid, IPC_RMID, NULL);
+		//printf("%s\n",buffer );
+		//send(new_socket , hello , strlen(hello) , 0 );
+	    }
+		return 0;
+	}
 
 Pada serverpenjual hanya menerima pesan dari client penjual jika tambah maka stok akan ditambahkan 1.Kemudian print jumlah stok setiap 5 detik.
 
@@ -289,7 +289,7 @@ Pada serverpenjual hanya menerima pesan dari client penjual jika tambah maka sto
         //send(new_socket , hello , strlen(hello) , 0 );
     }
     return 0;
-}
+	}
 
 Pada clientpembeli kirim pesan beli pada serverpembeli.
 
@@ -338,7 +338,7 @@ Pada clientpembeli kirim pesan beli pada serverpembeli.
         memset(buffer,0,1024);
     }    
     return 0;
-}
+	}
 
 Pada clientpenjual kirim pesan tambah pada serverpenjual agar stok ditambah.
 
@@ -386,7 +386,7 @@ Pada clientpenjual kirim pesan tambah pada serverpenjual agar stok ditambah.
         memset(buffer,0,1024);
     }    
     return 0;
-}
+	}
 
 
 ### No 3
@@ -514,6 +514,71 @@ Wajib Menggunakan Multithreading
 Boleh menggunakan system
 
 Jawab :
-Gunakan 2 thread untuk menyimpan 10 ps -aux pada file pertama dan kedua, kemudian 2 thread untuk menzip file pertama pada zip pertama
+Gunakan 2 thread untuk menyimpan 10 ps -aux pada file pertama dan kedua, kemudian 2 thread untuk menzip file pertama pada zip pertama dan zip kedua pada file ke 2 sekalian dengan menghapus kedua file tersebut setelah di zip. Kemudian 2 thread lagi untuk mengekstrak kembali kedua file zip pada masing masing folder tadi setelah menunggu 15 detik.
+
+	#include<stdio.h>
+	#include<string.h>
+	#include<pthread.h>
+	#include<stdlib.h>
+	#include<unistd.h>
+
+	pthread_t tid[2];
+
+	void* catat1(void *arg)
+	{
+	    system("ps -aux | head -11 | tail -10 > /home/najaslanardo/Documents/FolderProses1/SimpanProses1.txt");
+	}
+
+	void* catat2(void *arg)
+	{
+	    system("ps -aux | head -11 | tail -10 > /home/najaslanardo/Documents/FolderProses2/SimpanProses2.txt");
+	}
+
+	void* kompres1(void *arg)
+	{
+	    system("cd /home/najaslanardo/Documents/FolderProses1/ && zip -m KompresProses1.zip SimpanProses1.txt");
+	}
+
+	void* kompres2(void *arg)
+	{
+	    system("cd /home/najaslanardo/Documents/FolderProses2/ && zip -m KompresProses2.zip SimpanProses2.txt");
+	}
+
+	void* ekstrak1(void *arg)
+	{
+	    system("cd /home/najaslanardo/Documents/FolderProses1/ && unzip -o KompresProses1.zip");
+	}
+
+	void* ekstrak2(void *arg)
+	{
+	    system("cd /home/najaslanardo/Documents/FolderProses2/ && unzip -o KompresProses2.zip");
+	}
+
+
+	int main(void)
+	{
+
+	    pthread_create(&(tid[0]), NULL, &catat1, NULL);
+	    pthread_create(&(tid[1]), NULL, &catat2, NULL);
+
+	    pthread_join(tid[0], NULL);
+	    pthread_join(tid[1], NULL);
+
+	    pthread_create(&(tid[0]), NULL, kompres1, NULL);
+	    pthread_create(&(tid[1]), NULL, kompres2, NULL);
+
+	    pthread_join(tid[0], NULL);
+	    pthread_join(tid[1], NULL);
+
+	    printf("\nMenunggu 15 detik untuk mengekstrak kembali\n");
+	    sleep(15);
+	    pthread_create(&(tid[0]), NULL, ekstrak1, NULL);
+	    pthread_create(&(tid[1]), NULL, ekstrak2, NULL);
+
+	    pthread_join(tid[0], NULL);
+	    pthread_join(tid[1], NULL);
+
+	    return 0;
+	}
 
 ### No 5
