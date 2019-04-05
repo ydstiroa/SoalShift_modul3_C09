@@ -390,8 +390,11 @@ Pada clientpenjual kirim pesan tambah pada serverpenjual agar stok ditambah.
 	}
 
 Code lengkapnya : [Client Pembeli](/clientpembeli.c) 
+
 Code lengkapnya : [Client Penjual](/clientpenjual.c) 
+
 Code lengkapnya : [Server Pembeli](/serverpembeli.c) 
+
 Code lengkapnya : [Server Penjual](/serverpenjual.c)
 
 ### No 3
@@ -938,4 +941,5 @@ Sedangkangkan untuk membeli stock dibutuhkan restock dengn membuat program baru 
 		shmctl(shmid, IPC_RMID, NULL);
 		
 Code lengkapnya : [Soal5](/no5.c)
+
 Code lengkapnya : [Soal5b](/no5b.c)
