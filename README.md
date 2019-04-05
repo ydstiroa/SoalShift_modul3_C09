@@ -92,6 +92,7 @@ Gunakan struct yang berisi satu value int yaitu high untuk menyimpan setiap angk
         return 0;
 	}
 
+Code lengkapnya : [Soal 1](/soalno1.c) 
 
 ### No 2
 Pada suatu hari ada orang yang ingin berjualan 1 jenis barang secara private, dia memintamu membuat program C dengan spesifikasi sebagai berikut:
@@ -388,6 +389,10 @@ Pada clientpenjual kirim pesan tambah pada serverpenjual agar stok ditambah.
     return 0;
 	}
 
+Code lengkapnya : [Client Pembeli](/clientpembeli.c) 
+Code lengkapnya : [Client Penjual](/clientpenjual.c) 
+Code lengkapnya : [Server Pembeli](/serverpembeli.c) 
+Code lengkapnya : [Server Penjual](/serverpenjual.c)
 
 ### No 3
 Agmal dan Iraj merupakan 2 sahabat yang sedang kuliah dan hidup satu kostan, sayangnya mereka mempunyai gaya hidup yang berkebalikan, dimana Iraj merupakan laki-laki yang sangat sehat,rajin berolahraga dan bangun tidak pernah kesiangan sedangkan Agmal hampir menghabiskan setengah umur hidupnya hanya untuk tidur dan ‘ngoding’. Dikarenakan mereka sahabat yang baik, Agmal dan iraj sama-sama ingin membuat satu sama lain mengikuti gaya hidup mereka dengan cara membuat Iraj sering tidur seperti Agmal, atau membuat Agmal selalu bangun pagi seperti Iraj. Buatlah suatu program C untuk menggambarkan kehidupan mereka dengan spesifikasi sebagai berikut:
@@ -581,6 +586,8 @@ Gunakan 2 thread untuk menyimpan 10 ps -aux pada file pertama dan kedua, kemudia
 	    return 0;
 	}
 
+Code lengkapnya: [Soal 4](/soalno4.c)
+
 ### No 5
 Angga, adik Jiwang akan berulang tahun yang ke sembilan pada tanggal 6 April besok. Karena lupa menabung, Jiwang tidak mempunyai uang sepeserpun untuk membelikan Angga kado. Kamu sebagai sahabat Jiwang ingin membantu Jiwang membahagiakan adiknya sehingga kamu menawarkan bantuan membuatkan permainan komputer sederhana menggunakan program C. Jiwang sangat menyukai idemu tersebut. Berikut permainan yang Jiwang minta. 
 
@@ -677,3 +684,258 @@ Exit
 Pastikan terminal hanya mendisplay status detik ini sesuai scene terkait (hint: menggunakan system(“clear”))
 
 Jawab :
+
+Pertama buat input untuk nama setelah itu membuat 4 thread(makan,minum,regen,ready) dan 1 fungsi (pick()) 
+
+	printf("Enter Name : ");
+    	scanf("%s",name);
+
+	printf("Your Mosnter Name is : ");
+    	printf("%s\n",name);
+    	sleep(2);
+
+    	pthread_create(&(tid1), NULL, makan, NULL);
+    	pthread_create(&(tid2), NULL, mandi, NULL);
+    	pthread_create(&(tid3), NULL, regen, NULL);
+    	pthread_create(&(tid4), NULL, ready, NULL);
+    	pick();
+	
+Pada thread makan hunger status akan berkurang 5 setiap 10 detik
+	
+	void* makan(void *arg)
+	{
+	    while(1){
+		hunger_status -= 5;
+		sleep(10);
+	    }
+	}
+
+Pada thread mandi hygiene status akan berkurang 10 setiap 30 detik
+
+	void* mandi(void *arg)
+	{
+	    while(1){
+		hygiene_status -= 10;
+		sleep(30);
+	    }
+	}
+	
+Pada thread regen health status akan bertambah 5 setiap 10 detik
+
+	void* regen(void *arg){
+	    while(1){
+		health_status += 5;
+		sleep(10);
+	    }
+	}
+	
+Pada thread ready digunakan untuk meng countdown bath apakah sudah siap atau belum
+
+	void* ready(void *arg){
+	    while(1){
+		if(siap > 0){
+		    siap--;
+		    sleep(1);
+		}
+	    }
+	}
+
+Sedangkan fungsi pick() digunakan untuk membuat option pilihan 
+
+	void pick(){
+		while(1){
+		    printf("Standby Mode\n");
+		    printf("Health      : %d\n",health_status);
+		    printf("Hunger      : %d\n",hunger_status);
+		    printf("Hygiene     : %d\n",hygiene_status);
+		    printf("Food left   : %d\n", food_stock);
+		    if(siap > 0){
+			printf("Bath will be ready in %d\n",siap);
+		    }else{
+			printf("Bath is ready\n");
+		    }
+
+
+		    printf("Choices \n");
+		    printf("1. Eat \n");
+		    printf("2. Bath \n");
+		    printf("3. Battle \n");
+		    printf("4. Shop \n");
+		    printf("5. Exit \n");
+
+		    choose= mygetch();
+
+		    if(choose=='1'){
+			if(food_stock > 0){  
+			    //printf("%d\n",hunger_status);
+			    if(food_stock-15 >=0){
+				hunger_status += 15;
+				food_stock -=15;
+				sleep(1);
+			    }else{
+				hunger_status += food_stock;
+				food_stock = 0;
+			    }
+			}else{
+			    printf("\nMakanan Tidak Tersedia!\n");
+			    printf("Segera Restock Makanan\n");
+			    sleep(2);
+			}
+		    }
+		    if(choose=='2'){
+			if(hygiene_status<100){
+			    if(siap==0){
+				hygiene_status += 30;
+				if(hygiene_status > 100){
+				    hygiene_status = 100;
+				}
+				siap=20;
+			    }   
+			}else{
+			    system("clear");
+			    printf("tidak bisa\n");
+			    sleep(2);
+			    system("clear");
+			}
+			//printf("%d",hygiene_status);
+		    }
+		    if(choose=='3'){
+			system("clear");
+			fight();
+		    }
+		    if(choose=='4'){
+			system("clear");
+			belanja();
+		    }
+		    if(choose=='5'){
+			break;
+		    }
+		    if(hunger_status==0){
+			printf("%s Mati Kelaparan\n",name);
+			break;
+		    }
+		    if(hygiene_status==0){
+			printf("%s Mati Tidak Terawat\n",name);
+			break;
+		    }
+		    system("clear");
+		}
+	} 
+	
+Terdapat fungsi fight didalam fungsi pick yang berguna untuk battle dengan musuh
+
+	void fight(){
+	    enemy_health=100;
+	    while(1){
+		printf("Battle Mode\n");
+		printf("%s's Health : %d\n",name,health_status);
+		printf("Enemy Health : %d\n",enemy_health);
+		printf("Choices\n");
+		printf("1. Attack\n");
+		printf("2. Run\n");
+
+		choose=mygetch();
+
+		if(choose=='1'){
+		    health_status -= 20;
+		    enemy_health -= 20;
+
+		    if(enemy_health == 0){
+			printf("Congratulation\n");
+			printf("Your Enemy is Dead\n");
+			sleep(2);
+			break;
+		    }
+		    // printf("%d",health_status);
+		    // printf("%d",enemy_health);
+		}
+		if(choose=='2'){
+		    break;
+		}system("clear");
+	    }
+	}
+	
+Dan juga terdapat fungsi mygetch digunakan agar memilih option tanpa enter
+
+	int mygetch(void)
+	{
+	    struct termios oldt,
+	    newt;
+	    int ch;
+	    tcgetattr( STDIN_FILENO, &oldt );
+	    newt = oldt;
+	    newt.c_lflag &= ~( ICANON | ECHO );
+	    tcsetattr( STDIN_FILENO, TCSANOW, &newt );
+	    ch = getchar();
+	    tcsetattr( STDIN_FILENO, TCSANOW, &oldt );
+	    return ch;
+	}
+	
+Dan juga terdapat fungsi belanja untuk membeli stock makanan didalam fungsi pick juga
+
+	void belanja(){
+
+	    key_t key = 1234;
+	    int *stock;
+
+	    int shmid = shmget(key, sizeof(int), IPC_CREAT | 0666);
+	    stock = shmat(shmid, NULL, 0);
+
+	    while(1){
+		printf("Shop Mode\n");
+		printf("Shop food stock : %d\n",*stock);
+		printf("Your food stock : %d\n",food_stock);
+		printf("1. Buy\n");
+		printf("2. Back\n");
+
+		choose=mygetch();
+
+		if(choose=='1'){
+		    if(*stock > 0){
+			food_stock += 10;
+			*stock -= 10;
+		    }else{
+			system("clear");
+			printf("stock tidak cukup");
+		    }
+		}
+		if(choose=='2'){
+		    break;
+		}system("clear");
+	    }
+
+	    shmdt(stock);
+	    shmctl(shmid, IPC_RMID, NULL);
+	}
+
+Sedangkangkan untuk membeli stock dibutuhkan restock dengn membuat program baru dimana bertujuan untuk menambah stock pada toko
+
+	key_t key = 1234;
+		int *stock;
+
+		int shmid = shmget(key, sizeof(int), IPC_CREAT | 0666);
+		stock = shmat(shmid, NULL, 0);
+
+		*stock = 1000;
+
+		while(1){
+
+		    printf("Food stock : %d\n",*stock);
+		    printf("Choices\n");
+		    printf("1. Restock\n");
+		    printf("2. Exit\n");
+
+		    choose=mygetch();
+
+		    if(choose == '1'){
+			*stock += 10;
+		    }
+		    if(choose == '2'){
+			break;
+		    }system("clear");
+		}
+		shmdt(stock);
+		shmctl(shmid, IPC_RMID, NULL);
+		
+Code lengkapnya : [Soal5](/no5.c)
+Code lengkapnya : [Soal5b](/no5b.c)
