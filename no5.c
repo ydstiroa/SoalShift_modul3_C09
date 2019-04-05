@@ -240,4 +240,9 @@ int main(void)
     pthread_create(&(tid3), NULL, regen, NULL);
     pthread_create(&(tid4), NULL, ready, NULL);
     pick();
+    
+    // pthread_join(tid1, NULL);
+    // pthread_join(tid2, NULL);
+ 
+    // return 0;
 }
