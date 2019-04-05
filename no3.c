@@ -22,7 +22,7 @@ void* Agmal(void *arg)
         if(flg_agmal==1){
             sleep(10);
             flg_agmal=0;
-            i=0;
+            j=0;
         }
     }
     // if(strcmp(copy_of_line,"All_Status")==0){
@@ -36,7 +36,7 @@ void* Iraj(void *arg)
         if(flg_iraj==1){
             sleep(10);
             flg_iraj=0;
-            j=0;
+            i=0;
         }
     }
     // Spirit_Status = 100;
@@ -50,7 +50,7 @@ int main(void)
 {
     char msg[50];
     char a;
-    int tmp_agmal,tmp_iraj;
+    int tmp_agmal,tmp_iraj,tmp_stat;
 
     pthread_create(&(tid1), NULL, Agmal, NULL);
     pthread_create(&(tid2), NULL, Iraj, NULL);
@@ -59,12 +59,18 @@ int main(void)
         if(flg==1){
             break;
         }
+        
+        // if(tmp_stat == 0){
+        //     printf("Agmal WakeUp_Status = %d\n",WakeUp_Status);
+        //     printf("Iraj Spirit_Status = %d\n",Spirit_Status);
+        // }
         printf("Agmal WakeUp_Status = %d\n",WakeUp_Status);
         printf("Iraj Spirit_Status = %d\n",Spirit_Status);
         scanf("%[^\n]s",msg);
         scanf("%c",&a);
         tmp_agmal = strcmp(msg,"Agmal Ayo Bangun");
         tmp_iraj = strcmp(msg,"Iraj Ayo Tidur");
+        //tmp_stat = strcmp(msg,"All Status");
 
         if(tmp_agmal == 0){
             if(flg_agmal==0){
@@ -84,9 +90,11 @@ int main(void)
         }
         if(j==3){
             flg_agmal=1;
+            //j=0;
         }
         if(i==3){
             flg_iraj=1;
+            //i=0;
         }
         if(WakeUp_Status >= 100){
             printf("Agmal Terbangun,mereka bangun pagi dan berolahraga\n");
