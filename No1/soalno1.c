@@ -61,7 +61,7 @@ int main(){
 
   	while(a<n) {
  		rentang.high = prime_arr[a];
- 		temp=prime_arr[a];
+ 		temp=a;
  		pthread_create(&tid[temp], NULL, &tulis,(void *)&rentang);
         pthread_join(tid[temp],NULL);
     	a++;
